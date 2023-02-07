@@ -26,6 +26,55 @@ To repurpose our limit switch I tied it to GPIOs 0 and 2. GPIO_0 is setup as an 
   <img src="https://user-images.githubusercontent.com/50248029/217115863-f20e2546-2580-4d5b-9415-9c38e6ebac7c.png" width="60%" height="60%">
 </p>
 
+## Controlling the system
+Below is the main loop that our controller will be running through. When we open a serial connection (handled through Toast) this loop will start running. It checks to see if there is any data in the serial buffer. Once data is detected we evaluate if the information in the buffer matches a command we're looking for. In this instance the two commands I've setup are just looking for "1984" or 1985" in the serial buffer in order to run them. Your commands can be anything but I chose numbers for simplicity sake as your information coming in from the buffer will be a text string and it's easy to convert a text string of numbers to an integer you can evaluate against. 
+
+When we receive "1984" through the buffer we send back a message to the host stating the command was sent and then write GPIO_4 high for one second which activates the solenoid releasing the latch and launching the drawer open. The GPIO then goes back to low de-energizing the solenoid and we go back to waiting for a command. The drawer will remain open until manually closed and if an open command is sent again while open the solenoid will trigger but the latch will just toggle quickly since the drawer has already been released. 
+
+When we receive a "1985" command we read the state of GPIO_2. This pin is connected to GPIO_0 through the limit switch. Since GPIO_0 is always high when the switch is closed (drawer closed) GPIO_2 will read high. When the switch opens (drawer open) the circuit is broken and GPIO_2 will read low. We return this drawer state to the host device over our serial connection. 
+
+```
+void loop() {
+  // put your main code here, to run repeatedly:
+  digitalWrite(4, LOW);
+  while(Serial.available() > 0){
+      static char message[MAX_MESSAGE_LENGTH];
+      static unsigned int message_pos = 0;
+      char inByte = Serial.read();
+      if(inByte != '\n' && (message_pos < MAX_MESSAGE_LENGTH -1))
+      {
+        message[message_pos] = inByte;
+        message_pos++;
+      }
+      else
+      {
+        //Add null character to string
+        message[message_pos] = '\0';
+        //Print the message (or do other things)
+        Serial.println(message);
+        int(number) = atoi(message);
+        if(number == 1984){
+          Serial.println("open command sent");
+          digitalWrite(4,HIGH);
+          delay(1000);
+        }else if(number == 1985){
+          if(digitalRead(2)==LOW){
+            Serial.println("the drawer is open");
+          }
+          else{
+            Serial.println("the drawer is closed");
+          }
+        }
+        //Reset for the next message
+        message_pos = 0;
+      }
+  }
+}
+```
+
+## Working Demo
+add video here
+
 ## Possible system block diagram
 Below is a diagram of one proposed system. In this scenario we would connect our cable and have a detection method to switch the Vbus line of the USB port from 5V to 24V. The 24V line runs to a buck converter to drop the voltage to 3.3V for the MCU and solenoid which is wired through a power transistor controlled by the MCU. The USB communication lines continue to the MCU (through a USB to Serial converter) and finally we have the detection switch which is wired to the GPIO of the MCU. 
 
