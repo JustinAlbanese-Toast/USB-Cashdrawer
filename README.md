@@ -73,7 +73,10 @@ void loop() {
 ```
 
 ## Working Demo
-add video here
+
+https://user-images.githubusercontent.com/50248029/217127493-03d580a1-e0ef-4bdb-aa5f-d92e23f3d24f.mp4
+
+
 
 ## Possible system block diagram
 Below is a diagram of one proposed system. In this scenario we would connect our cable and have a detection method to switch the Vbus line of the USB port from 5V to 24V. The 24V line runs to a buck converter to drop the voltage to 3.3V for the MCU and solenoid which is wired through a power transistor controlled by the MCU. The USB communication lines continue to the MCU (through a USB to Serial converter) and finally we have the detection switch which is wired to the GPIO of the MCU. 
@@ -81,3 +84,7 @@ Below is a diagram of one proposed system. In this scenario we would connect our
 <p align="center">
   <img src="https://user-images.githubusercontent.com/50248029/217107398-357683c8-87c5-4dd5-9760-123aa217347a.png" width="80%" height="80%">
 </p>
+
+
+## Notes
+The first thing I thought to check was whether or not 24V is a hard requirement. I stepped down my voltage in 1V increments until I found the point where the solenoid will no longer trigger which was 6V. Stepping back up at 0.1V increments it began triggering again at 6.5V. Since the coil is only briefly energized my powersupply does not update it's current reading fast enough for me to see the actual current draw at 6.5V but It's something I'll have to look into with the power monitor. 
