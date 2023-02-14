@@ -89,11 +89,17 @@ Below is a diagram of one proposed system. In this scenario we would connect our
 ## Notes
 The first thing I thought to check was whether or not 24V is a hard requirement. I stepped down my voltage in 1V increments until I found the point where the solenoid will no longer trigger which was 6V. Stepping back up at 0.1V increments it began triggering again at 6.5V. Since the coil is only briefly energized my powersupply does not update it's current reading fast enough for me to see the actual current draw at 6.5V but It's something I'll have to look into with the power monitor. 
 
-Current draw is based on voltage.
+Current draw decreases with voltage.
+
 @24V current draw = 924mA
+
 @20V current draw = 770mA
+
 @15V current draw = 560mA
+
 @10V current draw = 365mA
+
 @8V current draw = 285mA
+
 
 Around 260mA the ability to trigger the piston seems to get spotty. 
